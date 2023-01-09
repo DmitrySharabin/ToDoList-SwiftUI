@@ -12,9 +12,10 @@ class ToDosViewModel: ObservableObject {
     
     init() {
         // Temp data here.
-        toDos.append(ToDo(id: UUID().uuidString, item: "Learn Swift"))
-        toDos.append(ToDo(id: UUID().uuidString, item: "Build Apps"))
-        toDos.append(ToDo(id: UUID().uuidString, item: "Change the World!"))
+//        toDos.append(ToDo(id: UUID().uuidString, item: "Learn Swift"))
+//        toDos.append(ToDo(id: UUID().uuidString, item: "Build Apps"))
+//        toDos.append(ToDo(id: UUID().uuidString, item: "Change the World!"))
+        loadData()
     }
     
     func saveToDo(toDo: ToDo) {
@@ -27,13 +28,36 @@ class ToDosViewModel: ObservableObject {
                 toDos[index] = toDo
             }
         }
+        saveData()
     }
     
     func deleteToDo(indexSet: IndexSet) {
         toDos.remove(atOffsets: indexSet)
+        saveData()
     }
     
     func moveToDo(fromOffsets: IndexSet, toOffset: Int) {
         toDos.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        saveData()
+    }
+    
+    func loadData() {
+        let path = URL.documentsDirectory.appending(component: "toDos")
+        guard let data = try? Data(contentsOf: path) else { return }
+        do {
+            toDos = try JSONDecoder().decode([ToDo].self, from: data)
+        } catch {
+            print("😡 ERROR: Could not save data \(error.localizedDescription)")
+        }
+    }
+    
+    func saveData() {
+        let path = URL.documentsDirectory.appending(component: "toDos")
+        let data = try? JSONEncoder().encode(toDos) // try? means if error thrown, data = nil
+        do {
+            try data?.write(to: path)
+        } catch {
+            print("😡 ERROR: Could not save data \(error.localizedDescription)")
+        }
     }
 }
