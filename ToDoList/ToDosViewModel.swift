@@ -41,6 +41,14 @@ class ToDosViewModel: ObservableObject {
         saveData()
     }
     
+    func toggleCompleted(toDo: ToDo) {
+        guard toDo.id != nil else { return }
+        if let index = toDos.firstIndex(where: { $0.id == toDo.id }) {
+            toDos[index].isCompleted.toggle()
+        }
+        saveData()
+    }
+    
     func loadData() {
         let path = URL.documentsDirectory.appending(component: "toDos")
         guard let data = try? Data(contentsOf: path) else { return }
